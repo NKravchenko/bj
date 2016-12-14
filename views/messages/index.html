@@ -1,0 +1,126 @@
+<div class="container">
+    <div class="row">
+        Сортировать по:
+    </div>
+    <div class="row">
+        <a class="btn btn-default btn-xs" href="/messages?sort=date" role="button">Дате</a>
+        <a class="btn btn-default btn-xs" href="/messages?sort=name" role="button">Имени</a>
+        <a class="btn btn-default btn-xs" href="/messages?sort=email" role="button">Почте</a>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table id="msg-table" class="table table-striped">
+        <colgroup>
+            <col class="col-xs-1">
+            <col class="col-xs-7">
+            <col class="col-xs-1">
+        </colgroup>
+        <tbody>
+
+        <?php foreach ($data['messages'] as $data_val): ?>
+            <tr>
+                <th scope="row">
+                    <span class="m-block bold">
+                        <?= $data_val['name'] ?>
+                    </span>
+                    <?php $date = new DateTime($data_val['date_add'], new DateTimeZone('Europe/Kiev')) ?>
+                    <span class="m-block small">
+                        <?= $date->format('d.m.Y'); ?>
+                    </span>
+                    <span class="m-block small">
+                        <?= $date->format(" в " . 'H:i:s'); ?>
+                    </span>
+                </th>
+                <td>
+                    <?= $data_val['message'] ?>
+                    <?php if ($data_val['message_changed']): ?>
+                        <span class="m-changed small">Изменен администратором</span>
+                    <?php endif ?>
+                </td>
+                <td>
+                    <?php if ($data_val['img'] && $data_val['img_agreed'] == 1): ?>
+                        <div class="img">
+                            <a href="#" class="pop">
+                                <img class="img-responsive img-table img-thumbnail" src="<?=
+                                IMAGES_PATH . DS . $data_val['img'];
+                                ?> ">
+                            </a>
+                        </div>
+                    <?php endif ?>
+                </td>
+            </tr>
+        <?php endforeach ?>
+
+        </tbody>
+    </table>
+</div>
+
+<?php //Форма сообщений ?>
+<div class="row">
+    <div class="col-sm-6">
+        <div class=" " style="margin-top: 10%;">
+            <form role="form" id="contactForm" data-toggle="validator" enctype="multipart/form-data" action="/messages/addMessage">
+                <input type="hidden" name="form_id" value="<?= $data['formId'] ?>">
+
+                <div class="row">
+                    <div class="form-group col-sm-6">
+                        <label for="name" class="h4">Имя</label>
+                        <input type="text" class="form-control" id="name" name="name" placeholder="Введите Ваше имя" required>
+                    </div>
+                    <div class="form-group col-sm-6">
+                        <label for="email" class="h4">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Введите Ваш email" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="message" class="h4 ">Сообщение</label>
+                    <textarea id="message" name="message" class="form-control vresize" rows="3" placeholder="Введите сообщение" required></textarea>
+                </div>
+                <button type="submit" id="form-submit" class="btn btn-success btn-md">Отправить</button>
+                <button type="button" id="form-review" class="btn btn-default btn-md">Предварительный просмотр</button>
+                <!--submit-->
+                <?php //всплавыющее окно с сообщением от AJAX ?>
+                <div id="msgSubmit" class="h3 text-center hidden"></div>
+                <div class="clearfix"></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<?php //всплавыющее окно предварительного просмотра сообщения ?>
+<div class="row">
+    <div id="msg-review" class="panel-group hidden">
+        <div class="panel panel-info">
+            <div class="panel-heading">Предварительный сообщения</div>
+            <div class="panel-body"></div>
+        </div>
+    </div>
+</div>
+
+<?php //форма отправки изображений?>
+<div class="row" style="margin-top: 10px;">
+    <div class="col-sm-4">
+        <form role="form" id="imageForm" data-toggle="validator" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="fileToUpload">Выберите изображение:</label>
+                <input type="file" class="btn btn-warning btn-md" name="fileToUpload" id="fileToUpload" accept="image/*">
+                <input type="submit" class="btn btn-success btn-md" value="Upload Image" name="submit">
+            </div>
+            <div id="imgPreview" class="help-block"></div>
+        </form>
+    </div>
+</div>
+
+
+<?php //модальное окно для полного просмотра изображений ?>
+<div class="modal fade" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <img src="" class="imagepreview" style="width: 100%;">
+            </div>
+        </div>
+    </div>
+</div>
